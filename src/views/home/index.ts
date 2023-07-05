@@ -1,0 +1,6 @@
+export * from './SHero/SHero'
+export * from './SOfertas/SOfertas'
+export * from './SProductosDestacados/SProductosDestacados'
+export * from './SCta/SCta'
+export * from './STodosLosProductos/STodosLosProductos'
+export * from './SBanner/SBanner'

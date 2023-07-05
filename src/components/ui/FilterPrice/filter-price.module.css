@@ -1,0 +1,14 @@
+.slider {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(270deg, #cc4478 0%, #8831cc 100%);
+  border-radius: 50px;
+}
+.slider__thumb {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  cursor: grab;
+  border-radius: 50%;
+  outline: none;
+}
