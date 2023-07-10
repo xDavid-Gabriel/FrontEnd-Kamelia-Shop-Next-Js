@@ -1,10 +1,13 @@
 import tw from 'twin.macro'
 import { Carrito, Heart, Ofertas, Shop } from '../../../Icons'
+import { useStateAuthContext, useStateUiContext } from '../../../../../context'
 
 export const User = ({
   overlay = true,
   twUserStyle = tw`translate-y-[98%] bottom-0 w-full absolute z-20`,
 }) => {
+  const { logout } = useStateAuthContext()
+  const { toogleSideModalUser } = useStateUiContext()
   return (
     <>
       {overlay && <div tw="fixed inset-0 bg-black/0 z-10"></div>}
@@ -53,7 +56,13 @@ export const User = ({
               <p tw="text-dark-charcoa">Mi Cuenta</p>
             </div>
           </li>
-          <li tw="py-4 pl-20 text-pale-gray pr-5 cursor-pointer hover:text-black hover:bg-sky-blue">
+          <li
+            tw="py-4 pl-20 text-pale-gray pr-5 cursor-pointer hover:text-black hover:bg-sky-blue"
+            onClick={() => {
+              logout()
+              toogleSideModalUser()
+            }}
+          >
             Salir
           </li>
         </ul>

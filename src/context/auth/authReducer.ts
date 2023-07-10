@@ -1,12 +1,14 @@
+import { IUser } from '../../interfaces'
 import { AuthState } from './'
 
 type AuthActionType =
   | {
-      type: '[Auth] - Login'
-      payload: ''
+      type: '[Auth] - Fetch User'
+      payload: IUser
     }
   | {
-      type: '[Auth] - Logout'
+      type: '[Auth] - Fetch Token'
+      payload: string
     }
 
 export const authReducer = (
@@ -14,13 +16,15 @@ export const authReducer = (
   action: AuthActionType,
 ): AuthState => {
   switch (action.type) {
-    case '[Auth] - Login':
+    case '[Auth] - Fetch User':
       return {
         ...state,
+        user: action.payload,
       }
-    case '[Auth] - Logout':
+    case '[Auth] - Fetch Token':
       return {
         ...state,
+        accessToken: action.payload,
       }
     default:
       return state

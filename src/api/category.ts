@@ -6,6 +6,7 @@ export class Category {
     try {
       // const populate = 'populate[models][populate][0]=products'
       const populate = 'populate[catalogs][populate][1]=models'
+      //const populate ='[fields][0]=name&[fields][1]=slug&populate[catalogs][fields][0]=name&populate[catalogs][fields][1]=slug&populate[catalogs][populate][models][fields][0]=name&populate[catalogs][populate][models][fields][1]=slug'
       const url = `${ENV.API_URL}/${ENV.ENDPOINTS.CATEGORY}?${populate}`
       const { data } = await axios.get(url)
       if (!data) {
@@ -67,7 +68,7 @@ export class Category {
   }
   */
 
-  //Traer todas las categorias con sus modelos
+  //Traer todas las categorias con sus catalogos y modelos
   async getCategoriesCatalogs() {
     try {
       const populate = 'populate[catalogs][populate][1]=models'
@@ -82,7 +83,7 @@ export class Category {
     }
   }
 
-  //Traer una categoria por el slug y con sus modelos nada mas
+  //Traer una categoria por el slug y con sus catalogos nada mas
   async getCategoryBySlugCatalogs(slug: string) {
     try {
       const filters = `filters[slug][$eq]=${slug}`

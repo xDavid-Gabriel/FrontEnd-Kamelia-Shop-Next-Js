@@ -1,9 +1,12 @@
 import { useStateUiContext } from '../../../../context'
+import { useStateCartContext } from '../../../../context/cart'
 import { ChevronBoton, Shop } from '../../Icons'
 import { Cart } from '../components'
 
 export const ShopHeader = () => {
   const { isModalCartOpen, toogleSideModalCart } = useStateUiContext()
+  const { total } = useStateCartContext()
+  console.log({ total })
 
   return (
     <div
@@ -13,7 +16,7 @@ export const ShopHeader = () => {
       <div tw="h-full relative bg-snow-white rounded-[7px_0_0_7px] w-[3.5rem] grid place-content-center cursor-pointer">
         <Shop size={25} tw="text-pink-raspberry" />
         <span tw="absolute bg-berry-crush grid place-content-center text-[11px] text-white font-bold rounded-full w-[18px] h-[18px] bottom-2 right-2">
-          10
+          {total}
         </span>
       </div>
       {/* <!-- Flecha --> */}

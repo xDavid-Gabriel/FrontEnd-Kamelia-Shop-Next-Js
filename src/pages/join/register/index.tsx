@@ -3,11 +3,29 @@ import { Auth } from '../../../api'
 import { BasicLayout } from '../../../components/layouts'
 import * as uiComps from '../../../components/ui'
 import Link from 'next/link'
-
 //Register yup Form
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import tw from 'twin.macro'
+import { useState } from 'react'
+import { useStateAuthContext } from '../../../context'
+
+const ages = Array.from({ length: 120 }, (e, i) => i + 1)
+const months = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+]
+const currentYear = new Date().getFullYear()
 
 export const initialValues = () => {
   return {
@@ -29,34 +47,54 @@ export const validationSchema = () => {
     username: Yup.string().required('Su nombre de usuario es requerido'),
     name: Yup.string().required('Su nombre es requerido'),
     password: Yup.string().required('Su contraseña es requerida'),
-    age: Yup.number()
+    age: Yup.string()
       .typeError('Debe ser un número válido')
-      .required('Su edad es requerida'),
-    month: Yup.number().required('Su mes es requerido'),
-    year: Yup.number().required('Su año es requerido'),
+      .required('Su edad es requerida')
+      .oneOf(
+        ages.map(age => age.toString().padStart(2, '0')),
+        'Seleccione un año válido',
+      )
+      .min(1, 'Seleccione un mes válido'),
+    month: Yup.string()
+      .required('Su mes es requerido')
+      .oneOf(
+        months.map(age => age),
+        'Seleccione un mes válido',
+      ),
+    year: Yup.number()
+      .required('Su año es requerido')
+      .positive('El año debe ser un número positivo')
+      .min(1900, 'Ingrese un año válido')
+      .test('year', 'El año debe ser menor o igual al actual', value => {
+        return value <= currentYear
+      }),
   })
 }
 const authCtrl = new Auth()
 
 const RegisterPage = () => {
+  const [notification, setNotification] = useState(false)
+  const { login } = useStateAuthContext()
   const router = useRouter()
   const formik = useFormik({
     initialValues: initialValues(),
     validationSchema: validationSchema(),
     validateOnChange: false,
-    onSubmit: async values => {
+    onSubmit: async (values, { resetForm }) => {
       try {
-        //await authCtrl.register(values)
-        console.log(values)
+        const { data } = await authCtrl.register(values)
 
-        // router.push('/')
+        login(data.jwt)
+        // Después de manejar el envío, puedes limpiar el formulario utilizando resetForm()
+        resetForm()
+        router.push('/')
       } catch (error) {
-        // if (error) {
-        //   setNotification(true)
-        //   setTimeout(() => {
-        //     setNotification(false)
-        //   }, 3000)
-        // }
+        if (error) {
+          setNotification(true)
+          setTimeout(() => {
+            setNotification(false)
+          }, 3000)
+        }
         console.log('Error', error)
       }
     },
@@ -74,13 +112,19 @@ const RegisterPage = () => {
               </p>
             </header>
             <form onSubmit={formik.handleSubmit}>
+              {notification && (
+                <p tw="p-4 rounded-[7px] bg-red-400 font-semibold mb-3 text-center">
+                  El usuario o el correo ya existen 🙁
+                </p>
+              )}
               <div tw="flex flex-col gap-[12px]">
                 <label htmlFor="#">Crea un Usuario</label>
                 <div>
                   <input
                     type="text"
                     name="username"
-                    tw="text-dark-charcoa/40 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    autoComplete="username"
                     value={formik.values.username}
                     onChange={formik.handleChange}
                     css={formik.errors.username ? tw`border-red-400` : tw``}
@@ -97,7 +141,8 @@ const RegisterPage = () => {
                   <input
                     type="text"
                     name="name"
-                    tw="text-dark-charcoa/40 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    autoComplete="name"
                     value={formik.values.name}
                     onChange={formik.handleChange}
                     css={formik.errors.name ? tw`border-red-400` : tw``}
@@ -113,7 +158,7 @@ const RegisterPage = () => {
                 <div>
                   <input
                     type="password"
-                    tw="text-dark-charcoa/40 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
                     name="password"
                     value={formik.values.password}
                     onChange={formik.handleChange}
@@ -132,7 +177,7 @@ const RegisterPage = () => {
                   <input
                     name="email"
                     type="email"
-                    tw="text-dark-charcoa/40 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                    tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
                     value={formik.values.email}
                     onChange={formik.handleChange}
                     css={formik.errors.email ? tw`border-red-400` : tw``}
@@ -147,15 +192,36 @@ const RegisterPage = () => {
                 <div tw="flex flex-col gap-[12px]">
                   <label htmlFor="#">Edad</label>
                   <div>
-                    <input
+                    {/* <input
                       name="age"
                       type="number"
-                      tw="text-dark-charcoa/40 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
+                      tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none w-full"
                       value={formik.values.age ?? 0}
                       onChange={formik.handleChange}
                       css={formik.errors.age ? tw`border-red-400` : tw``}
                       placeholder="0"
+                      maxLength={3}
                     />
+                    {formik.errors.age && (
+                      <p tw="text-red-400">{formik.errors.age}</p>
+                    )} */}
+                    <select
+                      name="age"
+                      tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none h-[52px] w-full"
+                      value={formik.values.age ?? 0}
+                      onChange={formik.handleChange}
+                      css={formik.errors.age ? tw`border-red-400` : tw``}
+                    >
+                      <option value="">Seleccione una edad</option>
+                      {ages.map(age => (
+                        <option
+                          value={age.toString().padStart(2, '0')}
+                          key={age}
+                        >
+                          {age.toString().padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
                     {formik.errors.age && (
                       <p tw="text-red-400">{formik.errors.age}</p>
                     )}
@@ -164,15 +230,32 @@ const RegisterPage = () => {
                 <div tw="flex flex-col gap-[12px]">
                   <label htmlFor="#">Mes</label>
                   <div>
-                    <input
+                    {/* <input
                       name="month"
                       type="number"
-                      tw="text-dark-charcoa/40 p-[12px 10px] border-[2px] border-transparent rounded-[7px] bg-snow-white outline-none w-full "
+                      tw="text-dark-charcoa/80 p-[12px 10px] border-[2px] border-transparent rounded-[7px] bg-snow-white outline-none w-full "
                       value={formik.values.month ?? 0}
                       onChange={formik.handleChange}
                       css={formik.errors.month ? tw`border-red-400` : tw``}
                       placeholder="0"
                     />
+                    {formik.errors.month && (
+                      <p tw="text-red-400">{formik.errors.month}</p>
+                    )} */}
+                    <select
+                      name="month"
+                      tw="text-dark-charcoa/80 border-[2px] border-transparent p-[12px 10px] rounded-[7px] bg-snow-white outline-none h-[52px] w-full"
+                      value={formik.values.month ?? 0}
+                      onChange={formik.handleChange}
+                      css={formik.errors.month ? tw`border-red-400` : tw``}
+                    >
+                      <option value="">Seleccione un mes</option>
+                      {months.map(month => (
+                        <option value={month} key={month}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
                     {formik.errors.month && (
                       <p tw="text-red-400">{formik.errors.month}</p>
                     )}
@@ -183,7 +266,7 @@ const RegisterPage = () => {
                   <div>
                     <input
                       type="number"
-                      tw="text-dark-charcoa/40 p-[12px 10px] border-[2px] border-transparent rounded-[7px] bg-snow-white outline-none w-full"
+                      tw="text-dark-charcoa/80 p-[12px 10px] border-[2px] border-transparent rounded-[7px] bg-snow-white outline-none w-full"
                       value={formik.values.year ?? 0}
                       onChange={formik.handleChange}
                       name="year"
@@ -197,9 +280,13 @@ const RegisterPage = () => {
                   </div>
                 </div>
               </div>
-              <uiComps.Button type="submit" variant="join">
-                Crear Cuenta
-              </uiComps.Button>
+              {notification ? (
+                ''
+              ) : (
+                <uiComps.Button type="submit" variant="join">
+                  Crear Cuenta
+                </uiComps.Button>
+              )}
             </form>
 
             <p tw="text-center">

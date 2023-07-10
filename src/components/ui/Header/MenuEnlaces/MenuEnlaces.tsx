@@ -15,6 +15,7 @@ import { useRouter } from 'next/router'
 import * as uiComps from '../../'
 import styled from 'styled-components'
 import { User } from '../components'
+import { useStateAuthContext } from '../../../../context'
 
 const ListaEnlace = styled.ul`
   visibility: visible;
@@ -59,6 +60,7 @@ const ListaEnlace = styled.ul`
 `
 
 export const MenuEnlaces = () => {
+  const { user } = useStateAuthContext()
   const [isOpen, setIopen] = useState(false)
   const [isUser, setIsUser] = useState(false)
 
@@ -135,19 +137,23 @@ export const MenuEnlaces = () => {
             Ayuda
           </Link>
         </li>
-        <li tw="2xl:hidden">
-          <button tw="w-[4rem] h-[4rem] relative" onClick={toogleIsUser}>
-            <uiComps.OptimizedImage
-              src="/img/user.webp"
-              alt="User"
-              width={100}
-              height={100}
-            />
-            <span tw="bg-pink-raspberry px-3 absolute bottom-0 right-0 py-1 rounded-full block w-fit">
-              <Hamburguer size={13} />
-            </span>
-          </button>
-        </li>
+        {Object.keys(user).length === 0 ? (
+          ''
+        ) : (
+          <li tw="2xl:hidden">
+            <button tw="w-[4rem] h-[4rem] relative" onClick={toogleIsUser}>
+              <uiComps.OptimizedImage
+                src="/img/user.webp"
+                alt="User"
+                width={100}
+                height={100}
+              />
+              <span tw="bg-pink-raspberry px-3 absolute bottom-0 right-0 py-1 rounded-full block w-fit">
+                <Hamburguer size={13} />
+              </span>
+            </button>
+          </li>
+        )}
       </ListaEnlace>
       {isUser && (
         <User

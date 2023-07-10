@@ -5,8 +5,12 @@ import 'swiper/css/navigation'
 
 // import required modules
 import { Autoplay, Navigation } from 'swiper'
-const products = Array.from({ length: 20 }, (e, index) => index + 1)
+import { destacadosProducts } from '../../../data'
+import { useStateCartContext } from '../../../context/cart'
+import { useCallback } from 'react'
+
 export const SProductosDestacados = () => {
+  const { cart, addCart } = useStateCartContext()
   return (
     <section tw="container">
       <header tw="[mask-border-slice:20_fill] my-4 [mask-border-source:url(/img/banner-mask.svg)] [mask-border-width:20px] p-[1px] [-webkit-mask-box-image-slice:20 fill] [-webkit-mask-box-image-source: url(/img/banner-mask.svg)] [-webkit-mask-box-image-width: 20px;] bg-red-400">
@@ -45,11 +49,23 @@ export const SProductosDestacados = () => {
         }}
         tw="max-w-[252px] mx-auto sm:max-w-[508px] md:max-w-[initial] md:mx-0"
       >
-        {products.map(product => (
-          <SwiperSlide key={product}>
-            <uiComps.Card />
-          </SwiperSlide>
-        ))}
+        {destacadosProducts.map(destacadoProduct => {
+          const inTheCart = !!cart.find(
+            item => item.id === destacadoProduct.id && item.inTheCart,
+          )
+          const addCartWrapper = useCallback(() => {
+            addCart(destacadoProduct.id)
+          }, [addCart, destacadoProduct.id])
+          return (
+            <SwiperSlide key={destacadoProduct.id}>
+              <uiComps.Card
+                productId={destacadoProduct.id}
+                inTheCart={inTheCart}
+                addCartWrapper={addCartWrapper}
+              />
+            </SwiperSlide>
+          )
+        })}
         <uiComps.BtnPrev btnPrevStyle="secondary" />
         <uiComps.BtnNext btnNextStyle="secondary" />
       </Swiper>

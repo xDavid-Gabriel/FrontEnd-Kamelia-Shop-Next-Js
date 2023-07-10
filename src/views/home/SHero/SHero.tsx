@@ -6,8 +6,12 @@ import 'swiper/css/navigation'
 
 // import required modules
 import { Autoplay, Navigation } from 'swiper'
+import { heroProducts } from '../../../data'
+import { useStateCartContext } from '../../../context/cart'
+import React, { useCallback } from 'react'
 
 export const SHero = () => {
+  const { cart, addCart } = useStateCartContext()
   return (
     <section>
       <header tw="bg-[url('/img/home/mobile/hero.webp')] lg:bg-[url('/img/home/desktop/hero.webp')] bg-no-repeat bg-cover bg-center py-[6.5rem]">
@@ -59,15 +63,24 @@ export const SHero = () => {
               }}
               tw="max-w-[252px] sm:max-w-[508px]  lg:[position: initial]"
             >
-              <SwiperSlide>
-                <uiComps.Card />
-              </SwiperSlide>
-              <SwiperSlide>
-                <uiComps.Card />
-              </SwiperSlide>
-              <SwiperSlide>
-                <uiComps.Card />
-              </SwiperSlide>
+              {heroProducts.map(heroproduct => {
+                const inTheCart = !!cart.find(
+                  item => item.id === heroproduct.id && item.inTheCart,
+                )
+                const addCartWrapper = useCallback(() => {
+                  addCart(heroproduct.id)
+                }, [addCart, heroproduct.id])
+                return (
+                  <SwiperSlide key={heroproduct.id}>
+                    <uiComps.Card
+                      productId={heroproduct.id}
+                      inTheCart={inTheCart}
+                      addCartWrapper={addCartWrapper}
+                    />
+                  </SwiperSlide>
+                )
+              })}
+
               <uiComps.BtnPrev
                 btnPrevStyle="secondary"
                 size={22}

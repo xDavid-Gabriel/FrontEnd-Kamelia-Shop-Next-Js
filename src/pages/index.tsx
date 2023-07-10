@@ -1,4 +1,5 @@
 import { BasicLayout } from '../components/layouts'
+
 import {
   SBanner,
   SCta,

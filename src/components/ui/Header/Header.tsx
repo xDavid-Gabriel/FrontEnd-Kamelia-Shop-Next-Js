@@ -7,10 +7,11 @@ import { ShopHeader } from './ShopHeader/ShopHeader'
 import { UsuarioHeader } from './UsuarioHeader/UsuarioHeader'
 import { FavoriteHeader } from './FavoriteHeader/FavoriteHeader'
 import { MenuMobile } from './MenuMobile/MenuMobile'
-import { useStateUiContext } from '../../../context'
+import { useStateAuthContext, useStateUiContext } from '../../../context'
 
 export const Header = () => {
   const { isMenuOpen, toogleSideMenu } = useStateUiContext()
+  const { user } = useStateAuthContext()
   return (
     <header tw="sticky top-0 z-20 h-[153px] overflow-hidden lg:h-[83px] 2xl:h-auto 2xl:[overflow:initial]">
       <div tw="bg-dark-violet py-4">
@@ -42,14 +43,18 @@ export const Header = () => {
             </button>
           </form>
           {/* <!-- Iniciar sesion / registrarse --> */}
-          <div tw="items-center gap-3 hidden 2xl:flex">
-            <Link href="/join/login">
-              <uiComps.Button>Iniciar Sesión</uiComps.Button>
-            </Link>
-            <Link href="/join/register">
-              <uiComps.Button variant="secondary">Registrarse</uiComps.Button>
-            </Link>
-          </div>
+          {Object.keys(user).length === 0 ? (
+            <div tw="items-center gap-3 hidden 2xl:flex">
+              <Link href="/join/login">
+                <uiComps.Button>Iniciar Sesión</uiComps.Button>
+              </Link>
+              <Link href="/join/register">
+                <uiComps.Button variant="secondary">Registrarse</uiComps.Button>
+              </Link>
+            </div>
+          ) : (
+            ''
+          )}
         </div>
       </div>
 
@@ -75,9 +80,8 @@ export const Header = () => {
           {/* <!-- Usuario, shop, favoritos --> */}
           <div tw="flex gap-4 items-center">
             {/* <!-- Usuario --> */}
-            <div tw="hidden">
-              <UsuarioHeader />
-            </div>
+
+            {Object.keys(user).length === 0 ? '' : <UsuarioHeader />}
 
             {/* <!-- shop --> */}
             <ShopHeader />

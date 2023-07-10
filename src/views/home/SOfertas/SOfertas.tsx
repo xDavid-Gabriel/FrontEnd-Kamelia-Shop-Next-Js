@@ -2,12 +2,14 @@ import * as uiComps from '../../../components/ui'
 import tw from 'twin.macro'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css/navigation'
-
 // import required modules
 import { Autoplay, Navigation } from 'swiper'
-const products = Array.from({ length: 20 }, (e, index) => index + 1)
+import { ofertaProducts } from '../../../data'
+import { useStateCartContext } from '../../../context/cart'
+import { useCallback } from 'react'
 
 export const SOfertas = () => {
+  const { cart, addCart } = useStateCartContext()
   return (
     <section tw="container">
       <header tw="[mask-border-slice:20_fill] [mask-border-source:url(/img/banner-mask.svg)] [mask-border-width:20px] my-4 py-5 bg-[url(/img/banner.webp)] [-webkit-mask-box-image-slice:20 fill] [-webkit-mask-box-image-source: url(/img/banner-mask.svg)] [-webkit-mask-box-image-width: 20px;] bg-center bg-cover px-7 flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center">
@@ -47,11 +49,24 @@ export const SOfertas = () => {
         }}
         tw="max-w-[252px] mx-auto sm:max-w-[508px] md:max-w-[initial] md:mx-0"
       >
-        {products.map(product => (
-          <SwiperSlide key={product}>
-            <uiComps.Card />
-          </SwiperSlide>
-        ))}
+        {ofertaProducts.map(ofertaProduct => {
+          const inTheCart = !!cart.find(
+            item => item.id === ofertaProduct.id && item.inTheCart,
+          )
+          const addCartWrapper = useCallback(() => {
+            addCart(ofertaProduct.id)
+          }, [addCart, ofertaProduct.id])
+
+          return (
+            <SwiperSlide key={ofertaProduct.id}>
+              <uiComps.Card
+                productId={ofertaProduct.id}
+                inTheCart={inTheCart}
+                addCartWrapper={addCartWrapper}
+              />
+            </SwiperSlide>
+          )
+        })}
         <uiComps.BtnPrev btnPrevStyle="secondary" />
         <uiComps.BtnNext btnNextStyle="secondary" />
       </Swiper>

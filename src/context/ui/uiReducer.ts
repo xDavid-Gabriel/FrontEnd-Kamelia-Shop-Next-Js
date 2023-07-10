@@ -1,4 +1,4 @@
-import { UiState } from './'
+import { UiState } from '.'
 type UiActionType =
   | { type: '[UI] - ToogleModalCart' }
   | { type: '[UI] - ToogleModalUser' }
