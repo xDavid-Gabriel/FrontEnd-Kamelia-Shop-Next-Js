@@ -2,14 +2,16 @@ import { CartState } from './'
 import { ICartItem } from '../../interfaces'
 
 type CartActionType =
-  | {
-      type: '[Cart] - Add Product'
-      payload: ICartItem[]
-    }
+  | { type: '[Cart] - Add Product'; payload: ICartItem[] }
   | { type: '[Cart] - Total'; payload: number }
+  | { type: '[Cart] - Fetch Cart'; payload: ICartItem[] }
   | {
-      type: '[Cart] - Set InTheCart'
-      payload: { productId: number; inTheCart: boolean }
+      type: '[Cart] - Totals Dicount Original Price'
+      payload: {
+        original: number
+        discount: number
+        price: number
+      }
     }
 
 export const cartReducer = (state: CartState, action: CartActionType) => {
@@ -17,24 +19,22 @@ export const cartReducer = (state: CartState, action: CartActionType) => {
     case '[Cart] - Add Product':
       return {
         ...state,
-        cart: [...state.cart, ...action.payload],
+        cart: [...action.payload],
       }
     case '[Cart] - Total':
       return {
         ...state,
         total: action.payload,
       }
-    case '[Cart] - Set InTheCart':
-      const { productId, inTheCart } = action.payload
+    case '[Cart] - Totals Dicount Original Price':
       return {
         ...state,
-        cart: state.cart.map(cart => {
-          if (cart.id === productId) {
-            return { ...cart, inTheCart: inTheCart }
-          }
-          return cart
-        }),
-        //aquiiiii
+        ...action.payload,
+      }
+    case '[Cart] - Fetch Cart':
+      return {
+        ...state,
+        cartData: [...action.payload],
       }
     default:
       return state

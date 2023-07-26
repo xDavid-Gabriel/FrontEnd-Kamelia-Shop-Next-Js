@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .env
+ngrok.exe
 # testing
 /coverage
 

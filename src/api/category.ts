@@ -1,13 +1,11 @@
 import axios from 'axios'
-import { ENV } from '../utils'
+import { ENV, ENV_DIEGO } from '../utils'
 
 export class Category {
+  //Traer todas las categorias con sus catalogos y modelos
   async getMenuData() {
     try {
-      // const populate = 'populate[models][populate][0]=products'
-      const populate = 'populate[catalogs][populate][1]=models'
-      //const populate ='[fields][0]=name&[fields][1]=slug&populate[catalogs][fields][0]=name&populate[catalogs][fields][1]=slug&populate[catalogs][populate][models][fields][0]=name&populate[catalogs][populate][models][fields][1]=slug'
-      const url = `${ENV.API_URL}/${ENV.ENDPOINTS.CATEGORY}?${populate}`
+      const url = `${ENV_DIEGO.API_DIEGO_URL}/${ENV_DIEGO.ENDPOINTS.COLLECTION}`
       const { data } = await axios.get(url)
       if (!data) {
         throw new Error('Data not found')

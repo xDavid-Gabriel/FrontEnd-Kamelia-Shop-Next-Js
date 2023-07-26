@@ -4,7 +4,7 @@ import Cookie from 'js-cookie'
 import { AES, enc } from 'crypto-js'
 const secret = process.env.NEXT_PUBLIC_CART_SECRET?.toString()!
 export class Cart {
-  add(productId: number | string) {
+  add(productId: number, quantity = 1) {
     const products: ICartItem[] = this.getAll()
     //Trae solamente si existe por medio del id, si no trae "-1" si no existe
     const objIndex = products.findIndex(product => product.id === productId)
@@ -16,22 +16,22 @@ export class Cart {
       //la variable "updatedProducts" traera todo lo que hay en el array "products" si no hay nada igual, pondra el "id" y el "quantity"  por defecto el "quantity" en 1 para decir que agrego un producto al carrito
       updatedProducts = [
         ...products,
-        { id: productId, quantity: 1, inTheCart: true },
+        { id: productId, quantity: quantity, inTheCart: true },
       ]
     } else {
       updatedProducts = products.map(product => {
         if (product.id === productId) {
-          return { ...product, quantity: product.quantity + 1 }
+          return { ...product, quantity: product.quantity + quantity }
         }
 
         return product
       })
     }
     //Encriptamos en las cookies
-    let encrypted = AES.encrypt(
-      JSON.stringify(updatedProducts),
-      secret,
-    ).toString()
+    // let encrypted = AES.encrypt(
+    //   JSON.stringify(updatedProducts),
+    //   secret,
+    // ).toString()
     let noEncrypted = JSON.stringify(updatedProducts)
     localStorage.setItem(ENV.CART, noEncrypted)
   }
@@ -64,50 +64,65 @@ export class Cart {
     return count
   }
 
-  // increaseQuantity(productId: number) {
-  //   const products: ICartItem[] = this.getAll()
+  increaseQuantity(productId: number) {
+    const products: ICartItem[] = this.getAll()
 
-  //   const updatedProducts = products.map(product => {
-  //     if (product.id === productId) {
-  //       return { ...product, quantity: product.quantity + 1 }
-  //     }
+    const updatedProducts = products.map(product => {
+      if (product.id === productId) {
+        return { ...product, quantity: product.quantity + 1 }
+      }
 
-  //     return product
-  //   })
+      return product
+    })
 
-  //   // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
-  //   //Encriptamos en las cookies
-  //   let encrypted = AES.encrypt(JSON.stringify(updatedProducts), secret).toString()
-  //   localStorage.setItem(ENV.CART, encrypted)
-  // }
+    // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
+    //Encriptamos en las cookies
+    // let encrypted = AES.encrypt(JSON.stringify(updatedProducts), secret).toString()
+    // localStorage.setItem(ENV.CART, encrypted)
 
-  // decreaseQuantity(productId: number) {
-  //   const products: ICartItem[] = this.getAll()
+    // let encrypted = AES.encrypt(
+    //   JSON.stringify(updatedProducts),
+    //   secret,
+    // ).toString()
+    let noEncrypted = JSON.stringify(updatedProducts)
+    localStorage.setItem(ENV.CART, noEncrypted)
+  }
 
-  //   const updatedProducts = products.map(product => {
-  //     if (product.id === productId && product.quantity > 1) {
-  //       return { ...product, quantity: product.quantity - 1 }
-  //     }
+  decreaseQuantity(productId: number) {
+    const products: ICartItem[] = this.getAll()
 
-  //     return product
-  //   })
+    const updatedProducts = products.map(product => {
+      if (product.id === productId && product.quantity > 1) {
+        return { ...product, quantity: product.quantity - 1 }
+      }
 
-  //   // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
-  //   //Encriptamos en las cookies
-  //   let encrypted = AES.encrypt(JSON.stringify(updatedProducts), secret).toString()
-  //   localStorage.setItem(ENV.CART, encrypted)
-  // }
+      return product
+    })
 
-  // removeItem(productId: number) {
-  //   const products: ICartItem[] = this.getAll()
+    // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
+    //Encriptamos en las cookies
+    // let encrypted = AES.encrypt(
+    //   JSON.stringify(updatedProducts),
+    //   secret,
+    // ).toString()
+    // localStorage.setItem(ENV.CART, encrypted)
+    let noEncrypted = JSON.stringify(updatedProducts)
+    localStorage.setItem(ENV.CART, noEncrypted)
+  }
 
-  //   const updatedProducts = products.filter(product => product.id !== productId)
+  removeItem(productId: number) {
+    const products: ICartItem[] = this.getAll()
 
-  //   // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
-  //   //Encriptamos en las cookies o localstorage
-  //   let encrypted = AES.encrypt(JSON.stringify(updatedProducts), secret).toString()
-  //   localStorage.setItem(ENV.CART, encrypted)
-  // }
+    const updatedProducts = products.filter(product => product.id !== productId)
+
+    // Cookie.set(ENV.CART, JSON.stringify(updatedProducts))
+    //Encriptamos en las cookies o localstorage
+    // let encrypted = AES.encrypt(JSON.stringify(updatedProducts), secret).toString()
+    // localStorage.setItem(ENV.CART, encrypted)
+    let noEncrypted = JSON.stringify(updatedProducts)
+    localStorage.setItem(ENV.CART, noEncrypted)
+  }
+
   // deleteAll() {
   //   localStorage.removeItem(ENV.CART)
   // }

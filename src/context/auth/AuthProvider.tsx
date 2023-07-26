@@ -44,7 +44,6 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
       tokenCtrl.setToken(token)
       // Obtener los datos del usuario
       const response = await userCtrl.getMe()
-      console.log({ response })
 
       // Guardar los datos del usuario en el estado
       dispatch({ type: '[Auth] - Fetch User', payload: response })

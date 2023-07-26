@@ -13,6 +13,17 @@ const GlobalStyles = createGlobalStyle`
   .ReactCollapse--collapse {
   transition: height 500ms;
 }
+.swiper-pagination-bullet {
+  ${tw`bg-pale-gray`}
+}
+.swiper-pagination-bullet-active{
+  ${tw`bg-snow-white`}
+}
+.swiper-slide-thumb-active {
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
+  opacity: 1
+}
 ${{ ...(globalStyles as CSSObject) }}
 `
 

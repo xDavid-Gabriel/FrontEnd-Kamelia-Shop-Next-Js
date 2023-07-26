@@ -4,6 +4,7 @@ type UiActionType =
   | { type: '[UI] - ToogleModalUser' }
   | { type: '[UI] - ToogleModalFavorite' }
   | { type: '[UI] - ToogleMenu' }
+  | { type: '[UI] - Fetch Search History'; payload: string[] }
 
 export const uiReducer = (state: UiState, action: UiActionType): UiState => {
   switch (action.type) {
@@ -18,6 +19,12 @@ export const uiReducer = (state: UiState, action: UiActionType): UiState => {
 
     case '[UI] - ToogleMenu':
       return { ...state, isMenuOpen: !state.isMenuOpen }
+
+    case '[UI] - Fetch Search History':
+      return {
+        ...state,
+        searchHistory: [...action.payload],
+      }
     default:
       return state
   }

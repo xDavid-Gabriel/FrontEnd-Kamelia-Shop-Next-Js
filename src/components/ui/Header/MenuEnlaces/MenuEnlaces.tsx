@@ -32,6 +32,7 @@ const ListaEnlace = styled.ul`
   bottom: 0;
   font-weight: normal;
   color: #fff;
+  z-index: 0;
 
   @media (min-width: 640px) {
     justify-content: center;
@@ -48,15 +49,15 @@ const ListaEnlace = styled.ul`
   }
   // Estilo del thumb (barra de desplazamiento)
   &::-webkit-scrollbar {
-    width: 5px;
+    width: 0;
     border-radius: 100px;
-    height: 10px;
+    height: 0;
   }
 
-  &::-webkit-scrollbar-thumb {
+  /* &::-webkit-scrollbar-thumb {
     background-color: #cc4478;
     border-radius: 100px;
-  }
+  } */
 `
 
 export const MenuEnlaces = () => {
@@ -73,7 +74,10 @@ export const MenuEnlaces = () => {
   return (
     <>
       <ListaEnlace>
-        <li tw="flex-col flex items-center gap-2">
+        <li
+          tw="flex-col flex items-center gap-2 cursor-pointer"
+          onClick={() => router.push('/')}
+        >
           <Inicio tw="flex-none 2xl:hidden" />
           <Link
             href="/"
@@ -84,7 +88,7 @@ export const MenuEnlaces = () => {
             Inicio
           </Link>
         </li>
-        <li tw="flex-col flex items-center gap-2">
+        <li tw="flex-col flex items-center gap-2 cursor-pointer">
           <Categorias tw="flex-none 2xl:hidden" />
           <button
             tw="flex gap-1 items-center px-3 py-1.5 rounded-full hover:bg-pink-raspberry flex-col 2xl:gap-3 2xl:flex-row"
@@ -99,7 +103,10 @@ export const MenuEnlaces = () => {
           </button>
           {isOpen && <MenuCategorias toogleMegaMenu={toogleMegaMenu} />}
         </li>
-        <li tw="flex-col flex items-center gap-2">
+        <li
+          tw="flex-col flex items-center gap-2 cursor-pointer"
+          onClick={() => router.push('/ofertas')}
+        >
           <Ofertas tw="flex-none 2xl:hidden" />
           <Link
             href="/ofertas"
@@ -112,7 +119,10 @@ export const MenuEnlaces = () => {
             Ofertas
           </Link>
         </li>
-        <li tw="flex-col flex items-center gap-2">
+        <li
+          tw="flex-col flex items-center gap-2 cursor-pointer"
+          onClick={() => router.push('/empresa')}
+        >
           <Empresa tw="flex-none 2xl:hidden" />
           <Link
             href="/empresa"
@@ -155,9 +165,9 @@ export const MenuEnlaces = () => {
           </li>
         )}
       </ListaEnlace>
-      {isUser && (
+      {isUser && Object.keys(user).length !== 0 && (
         <User
-          twUserStyle={tw`visible h-[calc(100vh - 255px)] lg:h-[calc(100vh - 185px)] top-[153px] bg-white lg:top-[83px] w-full right-0 max-w-[600px] fixed z-20 2xl:hidden `}
+          twUserStyle={tw`visible h-[calc(100vh - 255px)] lg:h-[calc(100vh - 182px)] top-[153px] bg-white lg:top-[83px] w-full right-0 max-w-[600px] fixed z-20 2xl:hidden `}
           overlay={false}
         />
       )}

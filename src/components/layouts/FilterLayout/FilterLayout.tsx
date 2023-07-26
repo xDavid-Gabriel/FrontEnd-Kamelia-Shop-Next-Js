@@ -13,12 +13,15 @@ import { useAcordionToogle } from '../../../hooks'
 
 // Import Swiper styles
 import 'swiper/css'
+import { useStateUiContext } from '../../../context'
 
 interface Props {
   title?: string
-  categoriesCatalogs: ICategoryDatum[]
-  priceMin: number
-  priceMax: number
+  categoriesCatalogs?: ICategoryDatum[]
+  priceMin?: number
+  priceMax?: number
+  isLoading?: boolean
+  searchText?: string
 }
 const StyledFilters = styled.div`
   background-color: rgb(190 197 255 / 1);
@@ -52,17 +55,38 @@ const StyledFilters = styled.div`
     width: 0;
   }
 `
+const SearchList = styled.ul`
+  display: flex;
+  gap: 13px;
+  overflow: auto;
+  padding-bottom: 10px;
+  // Estilo del thumb (barra de desplazamiento)
+  &::-webkit-scrollbar {
+    width: 2px;
+    border-radius: 100px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cc4478;
+    border-radius: 100px;
+  }
+`
 export const FilterLayout: FC<PropsWithChildren<Props>> = ({
   title = 'Filters',
   children,
   categoriesCatalogs,
   priceMin,
   priceMax,
+  isLoading,
+  searchText,
 }) => {
+  const { searchHistory, removeItem } = useStateUiContext()
   const router = useRouter()
   const categoria = router.query.categoria
   const catalogo = router.query.catalog
   const modelo = router.query.model
+  const search = router.query.s
   const sort = router.query.sort
   const name = router.query.name
   const envioGratis = router.query.envio_gratis
@@ -95,21 +119,17 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
   // }
 
   useEffect(() => {
-    const foundCategory = categoriesCatalogs.find(
+    const foundCategory = categoriesCatalogs?.find(
       category => category.attributes.slug === categoria,
     )
 
     const foundCatalog = foundCategory?.attributes.catalogs?.data.find(
       catalog => catalog.attributes.slug === catalogo,
     )
-    console.log('openCategory', { openCategory: openCategory })
-
-    console.log('categoria', { foundCategory: foundCategory?.id })
-    //console.log('catalogo', { foundCatalog: foundCatalog?.id })
 
     setOpenCategory(foundCategory?.id ?? false)
     setOpenCatalog(foundCatalog?.id ?? false)
-  }, [categoria, catalogo])
+  }, [categoriesCatalogs, categoria, catalogo])
 
   return (
     <>
@@ -122,8 +142,17 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
       </Head>
       <uiComps.Header />
       <main tw="mt-10">
-        <section tw="container grid lg:[grid-template-columns:25rem 1fr] gap-5">
-          <div tw="flex flex-col gap-4">
+        {search && (
+          <section tw="container">
+            <strong tw="text-2xl flex flex-col text-center sm:flex-row sm:text-start gap-6 pb-4">
+              Resultados de búsqueda para:{' '}
+              <uiComps.H1>"{searchText}"</uiComps.H1>
+            </strong>
+          </section>
+        )}
+
+        <section tw="container lg:flex  gap-5">
+          <div tw="flex flex-col gap-4 lg:w-[43%] xl:w-[34%] 2xl:w-[30%]">
             <span tw="text-center">
               Te mostramos resultados para <strong>OBJETO BUSCADO</strong>{' '}
             </span>
@@ -134,9 +163,10 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
               </uiComps.H3>
             </div>
           </div>
-          <div tw="flex flex-col gap-4 mt-3">
+
+          <div tw="flex flex-col gap-4 mt-3 w-full lg:w-[57%] xl:w-[66%] 2xl:w-[70%]">
             <div tw="flex flex-col gap-5 justify-between items-center sm:flex-row">
-              <span>Filtrado de Búsqueda</span>
+              <span> Filtrado de Búsqueda :</span>
               <button
                 tw="bg-pink-raspberry flex items-center gap-3 text-snow-white rounded-[7px] py-3 px-6 lg:hidden"
                 onClick={toogleFilters}
@@ -145,16 +175,30 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                 <Hamburguer size={20} />
               </button>
             </div>
-            <div tw="flex gap-3">
-              <div tw="bg-orchid text-snow-white py-1.5 px-3 rounded-full flex gap-2 items-center cursor-pointer">
-                <CloseCircle size={20} />
-                Mochila
-              </div>
-              <div tw="bg-orchid text-snow-white py-1.5 px-3 rounded-full flex gap-2 items-center cursor-pointer">
-                <CloseCircle size={20} />
-                Mochila
-              </div>
-            </div>
+            {/* Historial de busqueda tabs */}
+            {searchHistory.length === 0 ? (
+              <span tw="font-bold">No tienes filtro de busquedas...</span>
+            ) : (
+              <SearchList>
+                {searchHistory.map(text => (
+                  <li key={text} tw="relative">
+                    <button
+                      onClick={() => router.push(`/search?s=${text}`)}
+                      tw="bg-orchid text-snow-white py-1.5 pl-10 pr-3 rounded-full  cursor-pointer border-[2px] border-transparent relative"
+                      css={text === search ? tw`border-[#FFFF00 ]` : ''}
+                    >
+                      {text}
+                    </button>
+                    <i
+                      tw="absolute left-3 top-[50%] translate-y-[-50%] text-snow-white cursor-pointer"
+                      onClick={() => removeItem(text)}
+                    >
+                      <CloseCircle size={20} />
+                    </i>
+                  </li>
+                ))}
+              </SearchList>
+            )}
           </div>
         </section>
         {/* Filtrados */}
@@ -190,8 +234,8 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   ''
                 ) : (
                   <uiComps.FilterPrice
-                    priceMin={priceMin}
-                    priceMax={priceMax}
+                    priceMin={priceMin ? priceMin : 0}
+                    priceMax={priceMax ? priceMax : 0}
                   />
                 )}
 
@@ -202,18 +246,20 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li> */}
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           envio_gratis: 'false',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {envioGratis === 'false' && (
@@ -224,18 +270,20 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li>
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           envio_gratis: 'true',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {envioGratis === 'true' && (
@@ -250,19 +298,21 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li> */}
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           sort: ':asc',
                           name: 'name',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {sort === ':asc' && name === 'name' && (
@@ -273,19 +323,22 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li>
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
+
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           sort: ':desc',
                           name: 'name',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {sort === ':desc' && name === 'name' && (
@@ -296,19 +349,21 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li>
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           sort: ':desc',
                           name: 'price',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {sort === ':desc' && name === 'price' && (
@@ -319,19 +374,21 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                   </li>
                   <li
                     tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer"
-                    onClick={() =>
+                    onClick={() => {
+                      toogleFilters()
                       router.replace({
                         query: {
-                          categoria,
+                          ...(categoria ? { categoria: categoria } : {}),
                           ...(modelo ? { model: modelo } : {}),
                           ...(catalogo ? { catalog: catalogo } : {}),
+                          ...(search ? { s: search } : {}),
                           sort: ':asc',
                           name: 'price',
                           min_price: minPrice || priceMin,
                           max_price: maxPrice || priceMax,
                         },
                       })
-                    }
+                    }}
                   >
                     <div tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center flex-none">
                       {sort === ':asc' && name === 'price' && (
@@ -352,45 +409,48 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                 Categorías
               </span>
               <div tw="bg-cornflower-blue py-4 px-10 rounded-[0 0 7px 7px]">
-                {categoriesCatalogs.map(categorieCatalog => (
-                  <React.Fragment key={categorieCatalog.id}>
-                    <button
-                      className={source_code_pro.className}
-                      tw="text-dark-violet text-[18px] mt-4  font-bold flex items-center gap-2"
-                      onClick={() => toggleCategory(categorieCatalog.id)}
-                    >
-                      {categorieCatalog.attributes.name}
-                      <i
-                        tw="transition duration-300"
-                        css={
-                          openCategory === categorieCatalog.id
-                            ? tw`rotate-180`
-                            : tw`rotate-0`
-                        }
+                {isLoading ? (
+                  <uiComps.BasicLoading />
+                ) : (
+                  categoriesCatalogs?.map(categorieCatalog => (
+                    <React.Fragment key={categorieCatalog.id}>
+                      <button
+                        className={source_code_pro.className}
+                        tw="text-dark-violet text-[18px] mt-4  font-bold flex items-center gap-2"
+                        onClick={() => toggleCategory(categorieCatalog.id)}
                       >
-                        <ChevronBoton size={13} />
-                      </i>
-                    </button>
-
-                    <Collapse isOpened={openCategory === categorieCatalog.id}>
-                      <ul tw="flex flex-col gap-3 mt-5 ml-3">
-                        <Link
-                          tw="rounded-full px-2 py-1 text-snow-white bg-pink-raspberry w-fit"
-                          href={`/${categorieCatalog.attributes.slug}`}
-                          onClick={toogleFilters}
+                        {categorieCatalog.attributes.name}
+                        <i
+                          tw="transition duration-300"
+                          css={
+                            openCategory === categorieCatalog.id
+                              ? tw`rotate-180`
+                              : tw`rotate-0`
+                          }
                         >
-                          Ver todo
-                        </Link>
-                        {categorieCatalog.attributes.catalogs?.data.map(
-                          catalog => (
-                            <React.Fragment key={catalog.id}>
-                              <li
-                                tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer w-fit"
-                                onClick={() => {
-                                  toggleCatalog(catalog.id)
-                                }}
-                              >
-                                {/* <Link
+                          <ChevronBoton size={13} />
+                        </i>
+                      </button>
+
+                      <Collapse isOpened={openCategory === categorieCatalog.id}>
+                        <ul tw="flex flex-col gap-3 mt-5 ml-3">
+                          <Link
+                            tw="rounded-full px-2 py-1 text-snow-white bg-pink-raspberry w-fit"
+                            href={`/${categorieCatalog.attributes.slug}`}
+                            onClick={toogleFilters}
+                          >
+                            Ver todo
+                          </Link>
+                          {categorieCatalog.attributes.catalogs?.data.map(
+                            catalog => (
+                              <React.Fragment key={catalog.id}>
+                                <li
+                                  tw="flex gap-5 items-center text-slate-blue text-[18px] cursor-pointer w-fit"
+                                  onClick={() => {
+                                    toggleCatalog(catalog.id)
+                                  }}
+                                >
+                                  {/* <Link
                                     href={`/${categorieCatalog.attributes.slug}/${catalog.attributes.slug}`}
                                     tw="border-[2px] rounded-[7px] border-sky-blue w-7 h-7 grid place-content-center"
                                     onClick={() => {
@@ -401,56 +461,57 @@ export const FilterLayout: FC<PropsWithChildren<Props>> = ({
                                       <div tw="w-3.5 h-3.5 rounded-full bg-dark-violet"></div>
                                     )}
                                   </Link> */}
-                                {catalog.attributes.name}
-                                <i
-                                  tw="transition duration-300"
-                                  css={
-                                    openCatalog === catalog.id
-                                      ? tw`rotate-180`
-                                      : tw`rotate-0`
-                                  }
-                                >
-                                  <ChevronBoton size={13} />
-                                </i>
-                              </li>
-
-                              <Collapse isOpened={openCatalog === catalog.id}>
-                                <ul tw="ml-3 flex flex-col gap-3">
-                                  <Link
-                                    tw="rounded-full px-2 py-1 text-snow-white bg-pink-raspberry w-fit"
-                                    href={`/${categorieCatalog.attributes.slug}/${catalog.attributes.slug}`}
-                                    onClick={toogleFilters}
+                                  {catalog.attributes.name}
+                                  <i
+                                    tw="transition duration-300"
+                                    css={
+                                      openCatalog === catalog.id
+                                        ? tw`rotate-180`
+                                        : tw`rotate-0`
+                                    }
                                   >
-                                    Ver todo
-                                  </Link>
-                                  {catalog.attributes.models?.data.map(
-                                    model => (
-                                      <li key={model.id}>
-                                        <Link
-                                          href={`/${categorieCatalog.attributes.slug}/${catalog.attributes.slug}/${model.attributes.slug}`}
-                                          tw="flex gap-3 items-center text-slate-blue text-[18px] cursor-pointer w-fit"
-                                          onClick={toogleFilters}
-                                        >
-                                          <div tw="border-[2px] rounded-[7px] flex-none border-sky-blue w-7 h-7 grid place-content-center">
-                                            {modelo ===
-                                              model.attributes.slug && (
-                                              <div tw="w-3.5 h-3.5 rounded-full bg-dark-violet"></div>
-                                            )}
-                                          </div>
-                                          {model.attributes.name}
-                                        </Link>
-                                      </li>
-                                    ),
-                                  )}
-                                </ul>
-                              </Collapse>
-                            </React.Fragment>
-                          ),
-                        )}
-                      </ul>
-                    </Collapse>
-                  </React.Fragment>
-                ))}
+                                    <ChevronBoton size={13} />
+                                  </i>
+                                </li>
+
+                                <Collapse isOpened={openCatalog === catalog.id}>
+                                  <ul tw="ml-3 flex flex-col gap-3">
+                                    <Link
+                                      tw="rounded-full px-2 py-1 text-snow-white bg-pink-raspberry w-fit"
+                                      href={`/${categorieCatalog.attributes.slug}/${catalog.attributes.slug}`}
+                                      onClick={toogleFilters}
+                                    >
+                                      Ver todo
+                                    </Link>
+                                    {catalog.attributes.models?.data.map(
+                                      model => (
+                                        <li key={model.id}>
+                                          <Link
+                                            href={`/${categorieCatalog.attributes.slug}/${catalog.attributes.slug}/${model.attributes.slug}`}
+                                            tw="flex gap-3 items-center text-slate-blue text-[18px] cursor-pointer w-fit"
+                                            onClick={toogleFilters}
+                                          >
+                                            <div tw="border-[2px] rounded-[7px] flex-none border-sky-blue w-7 h-7 grid place-content-center">
+                                              {modelo ===
+                                                model.attributes.slug && (
+                                                <div tw="w-3.5 h-3.5 rounded-full bg-dark-violet"></div>
+                                              )}
+                                            </div>
+                                            {model.attributes.name}
+                                          </Link>
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                </Collapse>
+                              </React.Fragment>
+                            ),
+                          )}
+                        </ul>
+                      </Collapse>
+                    </React.Fragment>
+                  ))
+                )}
               </div>
             </div>
           </StyledFilters>

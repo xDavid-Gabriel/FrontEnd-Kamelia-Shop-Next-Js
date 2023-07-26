@@ -13,8 +13,10 @@ import { Collapse } from 'react-collapse'
 import { Favorite } from '../components/Favorite/Favorite'
 import { useStateUiContext } from '../../../../context'
 import { useAcordionToogle } from '../../../../hooks'
+import { useStateCartContext } from '../../../../context/cart'
 
 export const MenuMobile = () => {
+  const { total } = useStateCartContext()
   const { open: openMenuMobile, toggle: toggleMenuMobile } =
     useAcordionToogle(false)
 
@@ -48,14 +50,14 @@ export const MenuMobile = () => {
                     <Shop size={28} />
                   </i>
                   <span
-                    tw="w-5 transition duration-300 group-hover:bg-white group-hover:text-pink-raspberry top-4 right-[-7px] absolute h-5 rounded-full bg-pink-raspberry grid place-content-center"
+                    tw="w-5 text-[14px] transition duration-300 group-hover:bg-white group-hover:text-pink-raspberry top-4 right-[-7px] absolute h-5 rounded-full bg-pink-raspberry grid place-content-center"
                     css={
                       1 === openMenuMobile
                         ? tw`bg-white text-pink-raspberry`
                         : ''
                     }
                   >
-                    1
+                    {total}
                   </span>
                 </div>
                 <h3 tw="font-bold">Mis Productos</h3>

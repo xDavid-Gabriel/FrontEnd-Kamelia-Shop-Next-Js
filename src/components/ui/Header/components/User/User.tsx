@@ -1,6 +1,8 @@
 import tw from 'twin.macro'
 import { Carrito, Heart, Ofertas, Shop } from '../../../Icons'
 import { useStateAuthContext, useStateUiContext } from '../../../../../context'
+import { useStateCartContext } from '../../../../../context/cart'
+import Link from 'next/link'
 
 export const User = ({
   overlay = true,
@@ -8,6 +10,7 @@ export const User = ({
 }) => {
   const { logout } = useStateAuthContext()
   const { toogleSideModalUser } = useStateUiContext()
+  const { price } = useStateCartContext()
   return (
     <>
       {overlay && <div tw="fixed inset-0 bg-black/0 z-10"></div>}
@@ -19,7 +22,7 @@ export const User = ({
             </div>
             <div tw="text-charcoal flex flex-col gap-2">
               <span tw="text-sm">En el Carrito de Compra</span>
-              <span tw="font-bold">s/ 9999.99</span>
+              <span tw="font-bold">s/ {price.toFixed(2)}</span>
             </div>
             <a
               href="#"
@@ -28,16 +31,21 @@ export const User = ({
               Ver Carrito
             </a>
           </li>
-          <li tw="cursor-pointer p-5 bg-[linear-gradient(270deg,#CC4478 0%, #8831CC 100%)] flex justify-between items-center">
-            <div tw="flex items-center gap-3 text-white">
-              <div tw="w-9 h-9 rounded-full bg-white grid place-content-center">
-                <Ofertas size={18} tw="text-pink-raspberry" />
+          <li>
+            <Link
+              href="/ofertas"
+              tw="cursor-pointer p-5 bg-[linear-gradient(270deg,#CC4478 0%, #8831CC 100%)] flex justify-between items-center"
+            >
+              <div tw="flex items-center gap-3 text-white">
+                <div tw="w-9 h-9 rounded-full bg-white grid place-content-center">
+                  <Ofertas size={18} tw="text-pink-raspberry" />
+                </div>
+                <p>Novedades</p>
               </div>
-              <p>Novedades</p>
-            </div>
-            <a href="#" tw="text-dark-charcoa py-1 px-2 rounded-full bg-white">
-              Nuevo
-            </a>
+              <span tw="text-dark-charcoa py-1 px-2 rounded-full bg-white">
+                Nuevo
+              </span>
+            </Link>
           </li>
           <li tw="p-5 flex justify-between items-center cursor-pointer hover:bg-sky-blue">
             <div tw="flex items-center gap-3">

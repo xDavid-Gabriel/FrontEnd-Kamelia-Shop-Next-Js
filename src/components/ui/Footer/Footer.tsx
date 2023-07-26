@@ -150,7 +150,7 @@ export const Footer = () => {
             </ul>
           </div>
           <hr tw="bg-snow-white mt-[21px]" />
-          <div tw="py-[21px] flex flex-col gap-[12px] items-center md:block">
+          <div tw="pt-[21px] pb-[120px] 2xl:py-[21px] flex flex-col gap-[12px] items-center md:block">
             <p tw="text-snow-white text-sm font-semibold">
               © 2023 Copyright Kamelia Shopee
             </p>

@@ -8,10 +8,20 @@ import 'swiper/css/navigation'
 import { Autoplay, Navigation } from 'swiper'
 import { heroProducts } from '../../../data'
 import { useStateCartContext } from '../../../context/cart'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useData } from '../../../hooks'
+import { IProduct } from '../../../interfaces'
+import { ENV } from '../../../utils'
 
 export const SHero = () => {
-  const { cart, addCart } = useStateCartContext()
+  const {
+    data: productsHero,
+    isLoading,
+    isError,
+  } = useData<IProduct>(
+    `${ENV.API_URL}/${ENV.ENDPOINTS.PRODUCT}?pagination[limit]=4&populate[1]=model&populate[2]=cover`,
+  )
+
   return (
     <section>
       <header tw="bg-[url('/img/home/mobile/hero.webp')] lg:bg-[url('/img/home/desktop/hero.webp')] bg-no-repeat bg-cover bg-center py-[6.5rem]">
@@ -47,51 +57,31 @@ export const SHero = () => {
             <strong tw="text-2xl mb-5 block text-white">
               Productos hechos con Mágia ~✨
             </strong>
-            <Swiper
-              modules={[Navigation, Autoplay]}
-              slidesPerView={1}
-              spaceBetween={10}
-              grabCursor={true}
-              autoplay={{
-                delay: 3500,
-                disableOnInteraction: false,
-              }}
-              breakpoints={{
-                640: {
-                  slidesPerView: 2,
-                },
-              }}
-              tw="max-w-[252px] sm:max-w-[508px]  lg:[position: initial]"
-            >
-              {heroProducts.map(heroproduct => {
-                const inTheCart = !!cart.find(
-                  item => item.id === heroproduct.id && item.inTheCart,
-                )
-                const addCartWrapper = useCallback(() => {
-                  addCart(heroproduct.id)
-                }, [addCart, heroproduct.id])
-                return (
-                  <SwiperSlide key={heroproduct.id}>
-                    <uiComps.Card
-                      productId={heroproduct.id}
-                      inTheCart={inTheCart}
-                      addCartWrapper={addCartWrapper}
-                    />
-                  </SwiperSlide>
-                )
-              })}
-
-              <uiComps.BtnPrev
-                btnPrevStyle="secondary"
-                size={22}
-                additionalStyles={tw`xl:left-[-28px]`}
-              />
-              <uiComps.BtnNext
-                btnNextStyle="secondary"
-                size={22}
-                additionalStyles={tw`xl:right-[-28px]`}
-              />
-            </Swiper>
+            {isLoading ? (
+              <uiComps.BasicLoading />
+            ) : (
+              <uiComps.CardList
+                showAs="swiper"
+                products={productsHero}
+                stylesTw={tw`max-w-[252px] sm:max-w-[508px]  lg:[position: initial]`}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 2,
+                  },
+                }}
+              >
+                <uiComps.BtnPrev
+                  btnPrevStyle="secondary"
+                  size={22}
+                  additionalStyles={tw`xl:left-[-28px] xl:w-[3.5rem] xl:h-[3.5rem]`}
+                />
+                <uiComps.BtnNext
+                  btnNextStyle="secondary"
+                  size={22}
+                  additionalStyles={tw`xl:right-[-28px] xl:w-[3.5rem] xl:h-[3.5rem]`}
+                />
+              </uiComps.CardList>
+            )}
           </div>
         </div>
       </header>

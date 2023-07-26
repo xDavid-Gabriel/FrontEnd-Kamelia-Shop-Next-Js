@@ -32,7 +32,7 @@ export const BtnPrev = ({
 }: btnPrevProps) => {
   const primary = tw`bg-pink-raspberry w-10 h-10 hover:bg-pink-raspberry/80 text-white left-0`
 
-  const secondary = tw`w-[3.5rem] h-[3.5rem] hover:bg-pink-raspberry hover:text-snow-white text-pink-raspberry bg-snow-white border-[4px] border-pink-raspberry left-0`
+  const secondary = tw`w-[2.8rem] h-[2.8rem] hover:bg-pink-raspberry hover:text-snow-white text-pink-raspberry bg-snow-white border-[4px] border-pink-raspberry left-0 xl:w-[3.5rem] xl:h-[3.5rem]`
   // xl:left-[-28px]
 
   const swiper = useSwiper()
@@ -69,7 +69,7 @@ export const BtnNext = ({
 }: btnNextProps) => {
   const primary = tw`bg-pink-raspberry w-10 h-10 hover:bg-pink-raspberry/80 text-white right-0`
 
-  const secondary = tw`w-[3.5rem] h-[3.5rem] hover:bg-pink-raspberry hover:text-snow-white text-pink-raspberry bg-snow-white border-[4px] border-pink-raspberry right-0`
+  const secondary = tw`w-[2.8rem] h-[2.8rem] hover:bg-pink-raspberry hover:text-snow-white text-pink-raspberry bg-snow-white border-[4px] border-pink-raspberry right-0 xl:w-[3.5rem] xl:h-[3.5rem]`
   const swiper = useSwiper()
   // xl:right-[-28px]
 

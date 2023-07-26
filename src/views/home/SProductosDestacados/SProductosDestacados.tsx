@@ -8,9 +8,18 @@ import { Autoplay, Navigation } from 'swiper'
 import { destacadosProducts } from '../../../data'
 import { useStateCartContext } from '../../../context/cart'
 import { useCallback } from 'react'
+import { IProduct } from '../../../interfaces'
+import { useData } from '../../../hooks'
+import { ENV } from '../../../utils'
 
 export const SProductosDestacados = () => {
-  const { cart, addCart } = useStateCartContext()
+  const {
+    data: productsDestacados,
+    isLoading,
+    isError,
+  } = useData<IProduct>(
+    `${ENV.API_URL}/${ENV.ENDPOINTS.PRODUCT}?pagination[start]=14&pagination[limit]=13&populate[1]=model&populate[2]=cover`,
+  )
   return (
     <section tw="container">
       <header tw="[mask-border-slice:20_fill] my-4 [mask-border-source:url(/img/banner-mask.svg)] [mask-border-width:20px] p-[1px] [-webkit-mask-box-image-slice:20 fill] [-webkit-mask-box-image-source: url(/img/banner-mask.svg)] [-webkit-mask-box-image-width: 20px;] bg-red-400">
@@ -21,54 +30,36 @@ export const SProductosDestacados = () => {
           <uiComps.Button>Ver Todos los Productos</uiComps.Button>
         </div>
       </header>
-      <Swiper
-        modules={[Navigation, Autoplay]}
-        slidesPerView={1}
-        spaceBetween={10}
-        grabCursor={true}
-        autoplay={{
-          delay: 3500,
-          disableOnInteraction: false,
-        }}
-        breakpoints={{
-          640: {
-            slidesPerView: 2,
-          },
-          768: {
-            slidesPerView: 3,
-          },
-          1024: {
-            slidesPerView: 4,
-          },
-          1280: {
-            slidesPerView: 5,
-          },
-          1536: {
-            slidesPerView: 6,
-          },
-        }}
-        tw="max-w-[252px] mx-auto sm:max-w-[508px] md:max-w-[initial] md:mx-0"
-      >
-        {destacadosProducts.map(destacadoProduct => {
-          const inTheCart = !!cart.find(
-            item => item.id === destacadoProduct.id && item.inTheCart,
-          )
-          const addCartWrapper = useCallback(() => {
-            addCart(destacadoProduct.id)
-          }, [addCart, destacadoProduct.id])
-          return (
-            <SwiperSlide key={destacadoProduct.id}>
-              <uiComps.Card
-                productId={destacadoProduct.id}
-                inTheCart={inTheCart}
-                addCartWrapper={addCartWrapper}
-              />
-            </SwiperSlide>
-          )
-        })}
-        <uiComps.BtnPrev btnPrevStyle="secondary" />
-        <uiComps.BtnNext btnNextStyle="secondary" />
-      </Swiper>
+      {isLoading ? (
+        <uiComps.BasicLoading />
+      ) : (
+        <uiComps.CardList
+          showAs="swiper"
+          products={productsDestacados}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+            },
+            768: {
+              slidesPerView: 3,
+            },
+            1024: {
+              slidesPerView: 4,
+            },
+            1280: {
+              slidesPerView: 5,
+            },
+            1536: {
+              slidesPerView: 6,
+            },
+          }}
+          stylesTw={tw`max-w-[252px] mx-auto sm:max-w-[508px] md:max-w-[initial] md:mx-0`}
+        >
+          {' '}
+          <uiComps.BtnPrev btnPrevStyle="secondary" size={22} />
+          <uiComps.BtnNext btnNextStyle="secondary" size={22} />
+        </uiComps.CardList>
+      )}
     </section>
   )
 }

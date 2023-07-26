@@ -6,7 +6,6 @@ import { Cart } from '../components'
 export const ShopHeader = () => {
   const { isModalCartOpen, toogleSideModalCart } = useStateUiContext()
   const { total } = useStateCartContext()
-  console.log({ total })
 
   return (
     <div

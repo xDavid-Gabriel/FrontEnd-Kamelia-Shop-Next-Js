@@ -1,6 +1,7 @@
 export const ENV = {
   SERVER_HOST: process.env.NEXT_PUBLIC_SERVER_HOST,
   API_URL: process.env.NEXT_PUBLIC_API_URL,
+
   ENDPOINTS: {
     AUTH: {
       REGISTER: 'auth/local/register',
@@ -19,4 +20,5 @@ export const ENV = {
   },
   TOKEN: 'token',
   CART: 'cart',
+  SEARCH: 'search',
 }

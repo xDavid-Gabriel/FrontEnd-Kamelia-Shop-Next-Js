@@ -7,13 +7,14 @@ import { ShopHeader } from './ShopHeader/ShopHeader'
 import { UsuarioHeader } from './UsuarioHeader/UsuarioHeader'
 import { FavoriteHeader } from './FavoriteHeader/FavoriteHeader'
 import { MenuMobile } from './MenuMobile/MenuMobile'
+import { SearchModal } from './SearchModal/SearchModal'
 import { useStateAuthContext, useStateUiContext } from '../../../context'
 
 export const Header = () => {
   const { isMenuOpen, toogleSideMenu } = useStateUiContext()
   const { user } = useStateAuthContext()
   return (
-    <header tw="sticky top-0 z-20 h-[153px] overflow-hidden lg:h-[83px] 2xl:h-auto 2xl:[overflow:initial]">
+    <header tw="sticky top-0 z-20 h-[153px] lg:h-[83px] 2xl:h-auto 2xl:[overflow:initial]">
       <div tw="bg-dark-violet py-4">
         {/* <!-- Logo y buscador --> */}
         <div tw="container grid grid-cols-2 gap-5 items-center justify-between lg:flex 2xl:justify-start 2xl:gap-20 ">
@@ -32,16 +33,7 @@ export const Header = () => {
           >
             <Hamburguer size={35} tw="text-snow-white" />
           </button>
-          <form tw="relative col-span-2  lg:w-[50%] ">
-            <input
-              tw="w-full h-full outline-none p-4 rounded-[7px] placeholder:text-pale-gray text-pale-gray"
-              type="text"
-              placeholder="Buscar en Kamelia Shoppe..."
-            />
-            <button tw="cursor-pointer rounded-[0_7px_7px_0] h-full grid place-content-center bg-light-gray px-6 py-4 absolute right-0 top-[0]">
-              <Search size={25} />
-            </button>
-          </form>
+          <SearchModal />
           {/* <!-- Iniciar sesion / registrarse --> */}
           {Object.keys(user).length === 0 ? (
             <div tw="items-center gap-3 hidden 2xl:flex">
@@ -64,21 +56,26 @@ export const Header = () => {
           {/* <!-- Direccion y menu --> */}
           <div tw="items-center gap-8 flex">
             {/* <!-- Direcciones --> */}
-            <div tw="flex flex-none items-center gap-4 bg-white rounded-[7px] pr-[1rem]">
-              <button tw="py-3 px-6 rounded-[7px_0_0_7px] bg-pink-raspberry text-white flex flex-col gap-1 items-center">
-                <Ubicacion />
-                <p>Editar</p>
-              </button>
-              <div tw="text-dark-charcoa">
-                <p>Llegará mi pedido en:</p>
-                <strong>Av.Jorge Chavez 256</strong>
+            {Object.keys(user).length === 0 ? (
+              ''
+            ) : (
+              <div tw="hidden 2xl:flex flex-none items-center gap-4 bg-white rounded-[7px] pr-[1rem]">
+                <button tw="py-3 px-6 rounded-[7px_0_0_7px] bg-pink-raspberry text-white flex flex-col gap-1 items-center">
+                  <Ubicacion />
+                  <p>Editar</p>
+                </button>
+                <div tw="text-dark-charcoa">
+                  <p>Llegará mi pedido en:</p>
+                  <strong>Av.Jorge Chavez 256</strong>
+                </div>
               </div>
-            </div>
+            )}
+
             {/* <!-- Menu --> */}
             <MenuEnlaces />
           </div>
           {/* <!-- Usuario, shop, favoritos --> */}
-          <div tw="flex gap-4 items-center">
+          <div tw="hidden gap-4 items-center 2xl:flex">
             {/* <!-- Usuario --> */}
 
             {Object.keys(user).length === 0 ? '' : <UsuarioHeader />}

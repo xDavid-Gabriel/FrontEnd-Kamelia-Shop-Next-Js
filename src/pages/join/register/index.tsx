@@ -102,7 +102,7 @@ const RegisterPage = () => {
 
   return (
     <BasicLayout title="Registrate">
-      <div tw="grid lg:grid-cols-2 bg-[url(/img/login/desktop/login-bg.webp)] bg-center bg-no-repeat bg-cover">
+      <div tw="grid lg:grid-cols-2 bg-[url(/img/login/desktop/login-bg-desktop.webp)] bg-center bg-no-repeat bg-cover">
         <div tw="text-snow-white rounded-[0px 23px  23px 0px] bg-black/30 [background-blend-mode: overlay] px-4 [backdrop-filter: blur(67.95704650878906px);] p-[173px  0]">
           <div tw="flex flex-col gap-[26px] max-w-[403px] mx-auto ">
             <header tw="text-center">
